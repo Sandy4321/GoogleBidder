@@ -8,6 +8,7 @@ height = 250
 
 request = realtime_bidding_proto_pb2.BidRequest()
 request.id="1112"
+request.is_ping = 0
 request.google_user_id="aditya123"
 request.geo_criteria_id=geo_criteria_id
 request.url=url
