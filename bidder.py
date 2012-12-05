@@ -37,7 +37,7 @@ class MainHandler(tornado.web.RequestHandler):
         bidRequest = realtime_bidding_proto_pb2.BidRequest()
         try:
 	    bidRequest.ParseFromString(postContent)
-	    print bidRequest.url
+	    print bidRequest
             domain = re.sub('www.',r'',str(urlparse(bidRequest.url).netloc))
 
             geo_criteria_id=bidRequest.geo_criteria_id
@@ -55,6 +55,7 @@ class MainHandler(tornado.web.RequestHandler):
 		    city=""
 
 	    if not bidRequest.HasField("anonymous_id") and not bidRequest.HasField("Mobile") and not bidRequest.HasField("Video") and not bidRequest.is_ping:
+	        print "evaluating"
 		#segments = yield tornado.gen.Task(redisClient.smembers,'user:'+bidRequest.google_user_id)
 		segments=[]
 		adSlots = bidRequest.adslot
@@ -131,6 +132,7 @@ class MainHandler(tornado.web.RequestHandler):
 	    response = realtime_bidding_proto_pb2.BidResponse()
 	    response.processing_time_ms=int((time.time()-start)*1000)
 
+	print response
         responseString = response.SerializeToString()
 	self.write(responseString)
 	self.finish()
