@@ -138,7 +138,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    responsead = response.ad.add()
 			    responsead.html_snippet = code
 			    responsead.creative_id= randomBannerId
-			    responsead.click_through_url=campaignData['display:campaign:'+str(finalCampaign)+':url']
+			    responsead.click_through_url.append(campaignData['display:campaign:'+str(finalCampaign)+':url'])
 			    responseAdSlot = responsead.adslot.add()
 			    responseAdSlot.id=ad.id
 			    responseAdSlot.max_cpm_micros=int(bidMicros)
