@@ -19,7 +19,7 @@ ads.height.append(height)
 print request
 requestString = request.SerializeToString()
 
-conn = httplib.HTTPConnection("http://bid-hk.impulse01.com")
+conn = httplib.HTTPConnection("bid-hk.impulse01.com")
 conn.request("POST", "", requestString)
 response = conn.getresponse()
 print response.status, response.reason
