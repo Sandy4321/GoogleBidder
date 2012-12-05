@@ -1,10 +1,10 @@
 import realtime_bidding_proto_pb2
 import httplib, urllib
 
-url = "http://moneycontrol.com/map.php?id=33&jjhd=4456"
+url = "http://zyffg.com/map.php?id=33&jjhd=4456"
 geo_criteria_id=1007751
-width = 300
-height = 250
+width = 120
+height = 600
 
 request = realtime_bidding_proto_pb2.BidRequest()
 request.id="1112"

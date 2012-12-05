@@ -54,7 +54,6 @@ class MainHandler(tornado.web.RequestHandler):
 		    city=""
 
 	    if not bidRequest.HasField("anonymous_id") and not bidRequest.HasField("mobile") and not bidRequest.HasField("video") and not bidRequest.is_ping:
-		print "hey"
 		#segments = yield tornado.gen.Task(redisClient.smembers,'user:'+bidRequest.google_user_id)
 		segments=[]
 		adSlots = bidRequest.adslot
@@ -69,7 +68,6 @@ class MainHandler(tornado.web.RequestHandler):
 				audienceCampaigns=list()
 		    else:
 			audienceCampaigns=list()
-		    print "Audience Qualified Campaigns "+str(audienceCampaigns)		    
 
 		    try:
 			ronCampaigns = campaignData['display:roe']
@@ -82,33 +80,24 @@ class MainHandler(tornado.web.RequestHandler):
 			black = list()
 
 		    ronCampaigns = list(set(ronCampaigns) - set(black))			
-		    print "RON Qualified Campaigns "+str(ronCampaigns)		    
 
 		    try:
 		        whiteCampaigns = campaignData['display:white:'+domain]
 		    except KeyError:
 			whiteCampaigns = list()
-		    print "WhiteList Qualified Campaigns "+str(whiteCampaigns)			
 
 		    campaigns = list(set(audienceCampaigns+ronCampaigns+whiteCampaigns))
-
-		    print "Qualified Campaigns "+str(campaigns)
 		    
 		    geoCampaigns = campaignData['display:geo:'+country]
 		    campaigns = list(set(geoCampaigns) & set(campaigns))
-
-		    print "Qualified Campaigns After Geo Filter "+str(campaigns)
 		    
 		    size=str(ad.width[0])+"x"+str(ad.height[0])
 		    try:
 		        sizeCampaigns = campaignData['display:size:'+size]
 		    except KeyError:
 			sizeCampaigns = list()
-		    print "Campaigns with this size filter "+str(sizeCampaigns)
 			
 		    campaigns = list(set(sizeCampaigns) & set(campaigns))
-
-		    print "Qualified Campaigns After Size Filter "+str(campaigns)
 		    
 		    if(len(campaigns)>0):
 			camplist=[]
@@ -116,22 +105,15 @@ class MainHandler(tornado.web.RequestHandler):
 			    l = [camp, campaignData["display:campaign:"+str(camp)+":bid"],campaignData["display:campaign:"+str(camp)+":pacing"]]
 			    camplist.append(l)
 			camplist.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending by bids
-
-			print "Campaign list after sort"+str(camplist)
 			
 			finalCampaign=0
 			for camp in camplist:
-			  print "Qualifying campaign "+str(camp)
 			  r=random.randrange(1,100)
 			  if r<camp[2]:
-			    print "Qualified"
 			    finalCampaign=camp[0]
 			    break
 			  else:
-			    print "UnQualified"
 			    
-			print "Final Candidate"+str(finalCampaign)
-
 			if finalCampaign>0:    
 			    finalBid = campaignData["display:campaign:"+str(finalCampaign)+":bid"]
 			    banners = campaignData['display:campaign:'+str(finalCampaign)+':'+str(ad.width[0])+'x'+str(ad.height[0])]
