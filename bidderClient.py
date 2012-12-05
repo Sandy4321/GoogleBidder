@@ -22,9 +22,10 @@ requestString = request.SerializeToString()
 conn = httplib.HTTPConnection("bid-hk.impulse01.com")
 conn.request("POST", "", requestString)
 response = conn.getresponse()
-print response.status, response.reason
+print "Status = "+response.status
+print "Reason = "+response.reason
 
 data = response.read()
-print data
+print "Data"+data
 
 conn.close()
