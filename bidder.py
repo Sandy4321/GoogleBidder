@@ -131,11 +131,10 @@ class MainHandler(tornado.web.RequestHandler):
 			    finalBid = campaignData["display:campaign:"+str(finalCampaign)+":bid"]
 			    banners = campaignData['display:campaign:'+str(finalCampaign)+':'+str(ad.width[0])+'x'+str(ad.height[0])]
 			    randomBannerId = random.choice(banners)
-			    finalResult = {'campaignId':finalCampaign,'bannerId':randomBannerId,'bid':finalBid}
-			    bidMicros = bid['bid'] * 1000000
-			    info = base64.b64encode(json.dumps({'e':'GOOGLE','d':domain,'bid':bid['bannerId'],'cid':bid['campaignId']}))
+			    bidMicros = finalBid * 1000000
+			    info = base64.b64encode(json.dumps({'e':'GOOGLE','d':domain,'bid':randomBannerId,'cid':finalBid}))
 			    info = info.replace("+","-").replace("/","_").replace("=","")
-			    code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p={WINNING_PRICE}&r={RANDOM}&red={CLICKURL}" width="'+str(ad.width)+'" height="'+str(ad.height)+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'   
+			    code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p={WINNING_PRICE}&r={RANDOM}&red={CLICKURL}" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'   
 			    responsead = response.ad.add()
 			    responsead.html_snippet = code
 			    responsead.creative_id= randomBannerId
