@@ -72,11 +72,16 @@ class MainHandler(tornado.web.RequestHandler):
 		    print "Audience Qualified Campaigns "+str(audienceCampaigns)		    
 
 		    try:
-			ronCampaigns = campaignData['display:roe']			#Get all ROE Campaigns
-			black = campaignData['display:roe:black:'+domain]		#ROE Campaigns with this domain as blacklist
-			ronCampaigns = list(set(ronCampaigns) - set(black))
+			ronCampaigns = campaignData['display:roe']
 		    except KeyError:
 			ronCampaigns = list()
+
+		    try:
+			black = campaignData['display:roe:black:'+domain]		#ROE Campaigns with this domain as blacklist
+		    except KeyError:
+			black = list()
+
+		    ronCampaigns = list(set(ronCampaigns) - set(black))			
 		    print "RON Qualified Campaigns "+str(ronCampaigns)		    
 
 		    try:
