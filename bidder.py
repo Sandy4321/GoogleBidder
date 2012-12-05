@@ -99,6 +99,7 @@ class MainHandler(tornado.web.RequestHandler):
 		        sizeCampaigns = campaignData['display:size:'+size]
 		    except KeyError:
 			sizeCampaigns = list()
+		    print 'display:size:'+size
 		    print "Campaigns with this size filter "+str(sizeCampaigns)
 			
 		    campaigns = list(set(sizeCampaigns) & set(campaigns))
