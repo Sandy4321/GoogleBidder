@@ -35,9 +35,9 @@ class MainHandler(tornado.web.RequestHandler):
         start = time.time()
         postContent = self.request.body
         bidRequest = realtime_bidding_proto_pb2.BidRequest()
-        print bidRequest.url
         try:
 	    bidRequest.ParseFromString(postContent)
+	    print bidRequest.url
             domain = re.sub('www.',r'',str(urlparse(bidRequest.url).netloc))
 
             geo_criteria_id=bidRequest.geo_criteria_id
