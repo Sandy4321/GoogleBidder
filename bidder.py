@@ -94,12 +94,11 @@ class MainHandler(tornado.web.RequestHandler):
 
 		    print "Qualified Campaigns After Geo Filter "+str(campaigns)
 		    
-		    size=str(ad.width)+"x"+str(ad.height)
+		    size=str(ad.width[0])+"x"+str(ad.height[0])
 		    try:
 		        sizeCampaigns = campaignData['display:size:'+size]
 		    except KeyError:
 			sizeCampaigns = list()
-		    print 'display:size:'+size
 		    print "Campaigns with this size filter "+str(sizeCampaigns)
 			
 		    campaigns = list(set(sizeCampaigns) & set(campaigns))
