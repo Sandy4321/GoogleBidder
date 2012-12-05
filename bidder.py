@@ -128,8 +128,8 @@ class MainHandler(tornado.web.RequestHandler):
 			print "Final Candidate"+str(finalCampaign)
 
 			if finalCampaign>0:    
-			    finalBid = campaignData["display:campaign:"+str(camp)+":bid"]
-			    banners = campaignData['display:campaign:'+str(finalCampaign)+':'+width+'x'+height]
+			    finalBid = campaignData["display:campaign:"+str(finalCampaign)+":bid"]
+			    banners = campaignData['display:campaign:'+str(finalCampaign)+':'+ad.width[0]+'x'+ad.height[0]]
 			    randomBannerId = random.choice(banners)
 			    finalResult = {'campaignId':finalCampaign,'bannerId':randomBannerId,'bid':finalBid}
 			    bidMicros = bid['bid'] * 1000000
