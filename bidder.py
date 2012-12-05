@@ -34,9 +34,8 @@ class MainHandler(tornado.web.RequestHandler):
 	global ruleSet
         start = time.time()
         postContent = self.request.body
-        print postContent
         bidRequest = realtime_bidding_proto_pb2.BidRequest()
-        print bidRequest
+        print bidRequest.url
         try:
 	    bidRequest.ParseFromString(postContent)
             domain = re.sub('www.',r'',str(urlparse(bidRequest.url).netloc))
