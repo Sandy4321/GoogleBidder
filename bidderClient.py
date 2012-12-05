@@ -3,8 +3,8 @@ import httplib, urllib
 
 url = "http://moneycontrol.com/map.php?id=33&jjhd=4456"
 geo_criteria_id=1007751
-width = 728
-height = 90
+width = 300
+height = 250
 
 request = realtime_bidding_proto_pb2.BidRequest()
 request.id="1112"
@@ -22,7 +22,7 @@ requestString = request.SerializeToString()
 conn = httplib.HTTPConnection("bid-hk.impulse01.com")
 conn.request("POST", "", requestString)
 response = conn.getresponse()
-print "Status = "+response.status
+print "Status = "+str(response.status)
 print "Reason = "+response.reason
 
 data = response.read()

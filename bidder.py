@@ -53,9 +53,11 @@ class MainHandler(tornado.web.RequestHandler):
 		if cType=="UT":
 		    state=geoIndex[str(geo_criteria_id)]["Name"].lower()
 		    city=""
-
+	    print bidRequest.HasField("anonymous_id")
+	    print bidRequest.HasField("Mobile")
+	    print bidRequest.HasField("Video")
+	    print bidRequest.is_ping
 	    if not bidRequest.HasField("anonymous_id") and not bidRequest.HasField("Mobile") and not bidRequest.HasField("Video") and not bidRequest.is_ping:
-	        print "evaluating"
 		#segments = yield tornado.gen.Task(redisClient.smembers,'user:'+bidRequest.google_user_id)
 		segments=[]
 		adSlots = bidRequest.adslot
