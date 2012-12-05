@@ -137,7 +137,6 @@ class MainHandler(tornado.web.RequestHandler):
 	    response.processing_time_ms=int((time.time()-start)*1000)
 	    traceback.print_exc(file=sys.stdout)
 
-	print response
         responseString = response.SerializeToString()
 	self.write(responseString)
 	self.finish()
