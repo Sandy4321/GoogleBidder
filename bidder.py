@@ -112,7 +112,6 @@ class MainHandler(tornado.web.RequestHandler):
 			  if r<camp[2]:
 			    finalCampaign=camp[0]
 			    break
-			  else:
 			    
 			if finalCampaign>0:    
 			    finalBid = campaignData["display:campaign:"+str(finalCampaign)+":bid"]
