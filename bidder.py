@@ -95,19 +95,19 @@ class MainHandler(tornado.web.RequestHandler):
 		    if(len(campaigns)>0):
 			camplist=[]
 			for camp in campaigns:
-			    l = [camp, campaignData["display:campaign:"+str(camp)+":bid"],campaignData["display:campaign:"+str(camp)+":pacing"]
+			    l = [camp, campaignData["display:campaign:"+str(camp)+":bid"],campaignData["display:campaign:"+str(camp)+":pacing"]]
 			    camplist.append(l)
-			camplist.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending
+			camplist.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending by bids
 
 			finalCampaign=0
 			for camp in camplist:
-			  r=random.randrange()
+			  r=random.randrange(1,100)
 			  if r<camp[2]:
 			    finalCampaign=camp[0]
 			    break
 
 			if finalCampaign>0:    
-			    finalBid = cc
+			    finalBid = campaignData["display:campaign:"+str(camp)+":bid"]
 			    banners = campaignData['display:campaign:'+str(finalCampaign)+':'+width+'x'+height]
 			    randomBannerId = random.choice(banners)
 			    finalResult = {'campaignId':finalCampaign,'bannerId':randomBannerId,'bid':finalBid}
