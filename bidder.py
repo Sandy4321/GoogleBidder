@@ -189,17 +189,16 @@ class MainHandler(tornado.web.RequestHandler):
 	
 	
 #---------------------Refresh Campaign Index------------------------------------------------
-def refreshCache():
-    print "hello"
-    http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", handleCacheFetch)
+def refreshCache(self):
+    http_client = AsyncHTTPClient(self.ioloop)
+    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", self.handleCacheFetch)
 
-def handleCacheFetch(response):
+def handleCacheFetch(self.response):
     global campaignData
-    try:
-        invertedIndex=json.loads(response.body)
-    except:
+    if response.error
         invertedIndex=dict()
+    else
+	invertedIndex=json.loads(response.body)
     campaignData=invertedIndex
     print options.name+" Refreshed campaign inverted index from http://user.impulse01.com:5003/index?channel=1"
     del invertedIndex
