@@ -123,8 +123,7 @@ class MainHandler(tornado.web.RequestHandler):
 
 			#Retrieve rules from SQLLite and create rule dictionary
 			ruleDict=dict()
-			hour=india_time.strftime('%H')
-			print hour
+			hour=int(india_time.strftime('%H'))
 			if hour>=2 and hour<6:
 			  daypart=1
 			if hour>=6 and hour<10:
