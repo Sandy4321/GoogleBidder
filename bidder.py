@@ -190,21 +190,18 @@ class MainHandler(tornado.web.RequestHandler):
 	
 #---------------------Refresh Campaign Index------------------------------------------------
 def refreshCache():
-    thread.start_new_thread (refreshCacheThread,())  
+    http_client = httpclient.AsyncHTTPClient()
+    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", handleCacheFetch)
 
-def refreshCacheThread():
+def handleCacheFetch(response):
     global campaignData
-    http_client = tornado.httpclient.HTTPClient()
     try:
-        response = http_client.fetch("http://user.impulse01.com:5003/index?channel=1")
         invertedIndex=json.loads(response.body)
     except:
         invertedIndex=dict()
     campaignData=invertedIndex
     print options.name+" Refreshed campaign inverted index from http://user.impulse01.com:5003/index?channel=1"
     del invertedIndex
-    del response
-    del http_client
 #-----------------------------------------------------------------------------------------------
 
 
@@ -213,15 +210,14 @@ def refreshCacheThread():
 
 #---------------------Refresh Rules Database------------------------------------------------
 def refreshRules():
-    thread.start_new_thread (refreshRulesThread,())
-
-def refreshRulesThread():    
+    http_client = httpclient.AsyncHTTPClient()
+    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)
+    print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
+    
+def handleRulesFetch(response):    
     global con
     global cur
-    http_client = tornado.httpclient.HTTPClient()
-    print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
     try:
-	response = http_client.fetch("http://user.impulse01.com:5003/rules?channel=1")
 	rulesIndex=json.loads(response.body)
     except:
 	rulesIndex=dict()
@@ -237,12 +233,6 @@ def refreshRulesThread():
     cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?)', queryData)    
     print "inserted "+str(len(rulesIndex.keys()))+" records into rules table"
     print options.name+" Refreshed rules index from http://user.impulse01.com:5003/rules?channel=1"    
-    del response
-    del rulesIndex
-    del queryData
-    del sm
-    del record
-    del http_client
 #-----------------------------------------------------------------------------------------------
 
 
