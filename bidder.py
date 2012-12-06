@@ -124,6 +124,7 @@ class MainHandler(tornado.web.RequestHandler):
 			#Retrieve rules from SQLLite and create rule dictionary
 			ruleDict=dict()
 			hour=india_time.strftime('%H')
+			print hour
 			if hour>=2 and hour<6:
 			  daypart=1
 			if hour>=6 and hour<10:
@@ -136,6 +137,8 @@ class MainHandler(tornado.web.RequestHandler):
 			  daypart=5
 			if hour>=22 and hour<2:
 			  daypart=6
+			  
+			print daypart
 			weekday=india_time.strftime('%w')
 			if city=='':
 			  query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
