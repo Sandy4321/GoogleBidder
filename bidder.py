@@ -204,7 +204,7 @@ class MainHandler(tornado.web.RequestHandler):
 	self.finish()
 
 def autovivify(levels=1, final=dict):
-    return (defaultdict(final) if levels < 2 else defaultdict(lambda: autovivify(levels – 1, final)))
+    return (defaultdict(final) if levels < 2 else defaultdict(lambda: autovivify(levels - 1, final)))
 
 	
 #---------------------Refresh Campaign Index------------------------------------------------
