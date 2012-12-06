@@ -146,7 +146,7 @@ class MainHandler(tornado.web.RequestHandler):
 			newCampList=[]
 			for camp in camplist:
 			  if str(camp[0]) in rulesDict.keys():
-			    camp[1]=float(rulesDict[str(camp[0])
+			    camp[1]=float(rulesDict[str(camp[0]))
 			  newCampList.append(camp)
 			  
 			#Now start qualifying campaigns top-down by bids for pacing. If a campaign qualifies, choose it as a final candidate
