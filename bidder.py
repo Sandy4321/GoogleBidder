@@ -187,6 +187,8 @@ class MainHandler(tornado.web.RequestHandler):
 		response.processing_time_ms=int((time.time()-start)*1000)
 		
 	    bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"] += 1
+	    compare = (time.time() - bidCountIndex["GoogleAdX"][domain]["DisplayWeb"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])
+	    print "compare = "+str(compare)
 	    if (time.time() - bidCountIndex["GoogleAdX"][domain]["DisplayWeb"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])>10:
 	      i = bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]
 	      message = json.dumps({"messageType":"Forecast", "message":{"e":"GoogleAdX", "d":domain , "c":"DesktopDisplay" ,"geo":country.upper(),
