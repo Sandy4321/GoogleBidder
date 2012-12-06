@@ -1,5 +1,5 @@
-#Real Time Bidding Engine for Google Ad Exchangedomain
-#Sensitive code, lot of logics have been used at a lot of places. Changing might caught un-noticable bugs
+#Real Time Bidding Engine for Google Ad Exchange
+#Sensitive code, lot of logics have been used at a lot of places. Changing might cause un-noticable bugs
 
 import sys, traceback
 import random
@@ -23,7 +23,7 @@ import sqlite3
 import thread
 import csv
 import realtime_bidding_proto_pb2
-from pytz import timezone 
+from pytz import timezone
 from pyDes import *
 from urlparse import urlparse
 from tornado.web import asynchronous
@@ -39,6 +39,8 @@ class MainHandler(tornado.web.RequestHandler):
 	global ruleSet
 	global con
 	global cur
+	global india_tz
+	global india_time
         start = time.time()
         postContent = self.request.body
         bidRequest = realtime_bidding_proto_pb2.BidRequest()
@@ -129,13 +131,16 @@ class MainHandler(tornado.web.RequestHandler):
 			if hour>=22 and hour<2:
 			  daypart=6
 			weekday=india_time.strftime('%w')
-			query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
+			if city=='':
+			  query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
+			else:
+			  query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND city IS NULL AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
 			cur.execute(query)
 			rows=cur.fetchall()
 			for row in rows:
 			  rules=json.loads(row[9])
 			  for key in rules.keys():
-			    ruleDict[key]=rules[key]
+			    ruleDict[key]=float(rules[key])
 
 			#Loop over qualified campaigns and override the default bids with new bids from rules database
 			newCampList=[]
