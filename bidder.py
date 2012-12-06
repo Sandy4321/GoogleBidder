@@ -11,7 +11,7 @@ import datetime
 import base64
 import time
 import operator
-import tornado.ioloop
+import ioloop
 import tornado.web
 import tornado.httpclient
 import tornado.options
@@ -189,6 +189,7 @@ class MainHandler(tornado.web.RequestHandler):
 	
 	
 #---------------------Refresh Campaign Index------------------------------------------------
+@tornado.web.asynchronous
 def refreshCache():
     http_client = httpclient.AsyncHTTPClient()
     http_client.fetch("http://user.impulse01.com:5003/index?channel=1", handleCacheFetch)
@@ -209,6 +210,7 @@ def handleCacheFetch(response):
 
 
 #---------------------Refresh Rules Database------------------------------------------------
+@tornado.web.asynchronous
 def refreshRules():
     http_client = httpclient.AsyncHTTPClient()
     http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)

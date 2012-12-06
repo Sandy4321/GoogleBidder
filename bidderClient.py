@@ -1,9 +1,10 @@
 import realtime_bidding_proto_pb2
 import httplib, urllib
 
-url = ["http://zyffg.com/map.php?id=33&jjhd=4456","","","","","","","","",""]
-geo_criteria_id=[1007751,1007768,1007785,1007792,1007795,1007785]
-size=[[120,600],[300,250],[160,600],[728,90]]
+url = "http://zyffg.com/map.php?id=33&jjhd=4456"
+geo_criteria_id=1007751
+width = 120
+height = 600
 
 request = realtime_bidding_proto_pb2.BidRequest()
 request.id="1112"
