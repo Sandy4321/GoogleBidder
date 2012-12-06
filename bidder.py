@@ -190,13 +190,11 @@ class MainHandler(tornado.web.RequestHandler):
 	
 #---------------------Refresh Campaign Index------------------------------------------------
 @tornado.web.asynchronous
-def refreshCache(self):
-    http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", callback=self.handleCacheFetch)
-
-def handleCacheFetch(self,response):
+def refreshCache():
     global campaignData
     try:
+	http_client = httpclient.AsyncHTTPClient()
+	response=yield gen.Task(http_client.fetch, "http://user.impulse01.com:5003/index?channel=1")
         invertedIndex=json.loads(response.body)
     except:
         invertedIndex=dict()
@@ -211,12 +209,12 @@ def handleCacheFetch(self,response):
 
 #---------------------Refresh Rules Database------------------------------------------------
 @tornado.web.asynchronous
-def refreshRules(self):
+def refreshRules():
     http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", self.handleRulesFetch)
+    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)
     print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
     
-def handleRulesFetch(self,response):    
+def handleRulesFetch(response):    
     global con
     global cur
     try:
