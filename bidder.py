@@ -192,7 +192,7 @@ class MainHandler(tornado.web.RequestHandler):
 @tornado.web.asynchronous
 def refreshCache(self):
     http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", callback=handleCacheFetch)
+    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", handleCacheFetch)
 
 def handleCacheFetch(response):
     global campaignData
@@ -213,7 +213,7 @@ def handleCacheFetch(response):
 @tornado.web.asynchronous
 def refreshRules():
     http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", callback=handleRulesFetch)
+    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)
     print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
     
 def handleRulesFetch(response):    
@@ -323,6 +323,6 @@ india_time = datetime.datetime.now(india_tz)
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     application.listen(options.port)
+    tornado.ioloop.IOLoop.instance().start() 
     tornado.ioloop.PeriodicCallback(refreshCache, options.refreshCache).start()
     tornado.ioloop.PeriodicCallback(refreshRules, options.refreshCache).start()    
-    tornado.ioloop.IOLoop.instance().start() 
