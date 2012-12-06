@@ -195,7 +195,7 @@ class MainHandler(tornado.web.RequestHandler):
 	      bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"]=int(time.time())
 	      sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 	      sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-	      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+	      sock.sendto(message, (UDP_IP, UDP_PORT))
 	      print "sending inventory update package"
 	    
 	except:
