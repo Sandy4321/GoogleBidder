@@ -191,7 +191,7 @@ class MainHandler(tornado.web.RequestHandler):
 #---------------------Refresh Campaign Index------------------------------------------------
 def refreshCache():
     global campaignData
-    http_client = httpclient.HTTPClient()
+    http_client = tornado.httpclient.HTTPClient()
     try:
 	response = http_client.fetch("http://user.impulse01.com:5003/index?channel=1")
 	invertedIndex=json.loads(response.body)
