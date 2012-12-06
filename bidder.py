@@ -208,17 +208,15 @@ def refreshCache():
 
 #---------------------Refresh Rules Database------------------------------------------------
 def refreshRules():
-    http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)
-    print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
-    
-def handleRulesFetch(response):    
     global con
-    global cur
+    global cur  
+    http_client = tornado.httpclient.HTTPClient()
     try:
+	response = http_client.fetch("http://user.impulse01.com:5003/rules?channel=1")
 	rulesIndex=json.loads(response.body)
     except:
 	rulesIndex=dict()
+    print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
     queryData=[]
     for key in rulesIndex.keys():
 	sm=key.split("|")
