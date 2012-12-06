@@ -190,7 +190,7 @@ class MainHandler(tornado.web.RequestHandler):
 	
 #---------------------Refresh Campaign Index------------------------------------------------
 @tornado.web.asynchronous
-def refreshCache():
+def refreshCache(self):
     http_client = httpclient.AsyncHTTPClient()
     http_client.fetch("http://user.impulse01.com:5003/index?channel=1", handleCacheFetch)
 
@@ -211,7 +211,7 @@ def handleCacheFetch(response):
 
 #---------------------Refresh Rules Database------------------------------------------------
 @tornado.web.asynchronous
-def refreshRules():
+def refreshRules(self):
     http_client = httpclient.AsyncHTTPClient()
     http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)
     print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
