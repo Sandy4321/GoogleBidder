@@ -192,7 +192,7 @@ class MainHandler(tornado.web.RequestHandler):
 @tornado.web.asynchronous
 def refreshCache(self):
     http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", handleCacheFetch)
+    http_client.fetch("http://user.impulse01.com:5003/index?channel=1", callback=self.handleCacheFetch)
 
 def handleCacheFetch(self,response):
     global campaignData
@@ -213,7 +213,7 @@ def handleCacheFetch(self,response):
 @tornado.web.asynchronous
 def refreshRules(self):
     http_client = httpclient.AsyncHTTPClient()
-    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", handleRulesFetch)
+    http_client.fetch("http://user.impulse01.com:5003/rules?channel=1", self.handleRulesFetch)
     print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
     
 def handleRulesFetch(self,response):    
