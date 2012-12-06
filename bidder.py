@@ -1,3 +1,6 @@
+#Real Time Bidding Engine for Google Ad Exchangedomain
+#Sensitive code, lot of logics have been used at a lot of places. Changing might caught un-noticable bugs
+
 import sys, traceback
 import random
 import time  
@@ -16,6 +19,8 @@ import tornadoredis
 import tornado.gen
 #import redis
 import os
+import sqlite3
+import thread
 import csv
 import realtime_bidding_proto_pb2
 from pytz import timezone 
@@ -32,6 +37,8 @@ class MainHandler(tornado.web.RequestHandler):
 	global geoIndex
 	global campaignData
 	global ruleSet
+	global con
+	global cur
         start = time.time()
         postContent = self.request.body
         bidRequest = realtime_bidding_proto_pb2.BidRequest()
@@ -105,22 +112,54 @@ class MainHandler(tornado.web.RequestHandler):
 			    l = [camp, campaignData["display:campaign:"+str(camp)+":bid"],campaignData["display:campaign:"+str(camp)+":pacing"]]
 			    camplist.append(l)
 			camplist.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending by bids
-			
-			finalCampaign=0
+
+			#Retrieve rules from SQLLite and create rule dictionary
+			ruleDict=dict()
+			hour=india_time.strftime('%H')
+			if hour>=2 and hour<6:
+			  daypart=1
+			if hour>=6 and hour<10:
+			  daypart=2
+			if hour>=10 and hour<14:
+			  daypart=3
+			if hour>=14 and hour<18:
+			  daypart=4
+			if hour>=18 and hour<22:
+			  daypart=5
+			if hour>=22 and hour<2:
+			  daypart=6
+			weekday=india_time.strftime('%w')
+			query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
+			cur.execute(query)
+			rows=cur.fetchall()
+			for row in rows:
+			  rules=json.loads(row[9])
+			  for key in rules.keys():
+			    ruleDict[key]=rules[key]
+
+			#Loop over qualified campaigns and override the default bids with new bids from rules database
+			newCampList=[]
 			for camp in camplist:
+			  if str(camp[0]) in rulesDict.keys():
+			    camp[1]=float(rulesDict[str(camp[0]])
+			  newCampList.append(camp)
+			  
+			#Now start qualifying campaigns top-down by bids for pacing. If a campaign qualifies, choose it as a final candidate
+			finalCampaign=0
+			for camp in newCampList:
 			  r=random.randrange(1,100)
 			  if r<camp[2]:
 			    finalCampaign=camp[0]
+			    finalBid=camp[1]
 			    break
 			    
 			if finalCampaign>0:    
-			    finalBid = campaignData["display:campaign:"+str(finalCampaign)+":bid"]
 			    banners = campaignData['display:campaign:'+str(finalCampaign)+':'+str(ad.width[0])+'x'+str(ad.height[0])]
 			    randomBannerId = random.choice(banners)
 			    bidMicros = finalBid * 1000000
-			    info = base64.b64encode(json.dumps({'e':'GOOGLE','d':domain,'bid':randomBannerId,'cid':finalBid}))
+			    info = base64.b64encode(json.dumps({'e':'GOOGLE','d':domain,'bid':randomBannerId,'cid':finalCampaign}))
 			    info = info.replace("+","-").replace("/","_").replace("=","")
-			    code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p={WINNING_PRICE}&r={RANDOM}&red={CLICKURL}" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'   
+			    code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p={WINNING_PRICE}&r={RANDOM}&red={CLICKURL}" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'
 			    responsead = response.ad.add()
 			    responsead.html_snippet = code
 			    responsead.creative_id= randomBannerId
@@ -141,10 +180,14 @@ class MainHandler(tornado.web.RequestHandler):
 	self.write(responseString)
 	self.finish()
 	
-def autovivify(levels=1, final=dict):
-    return (defaultdict(final) if levels < 2 else defaultdict(lambda: autovivify(levels - 1, final)))
-    
+
+	
+	
+#---------------------Refresh Campaign Index------------------------------------------------
 def refreshCache():
+    thread.start_new_thread (refreshCacheThread, args[, kwargs] )  
+
+def refreshCacheThread():
     global campaignData
     http_client = tornado.httpclient.HTTPClient()
     try:
@@ -154,23 +197,54 @@ def refreshCache():
         invertedIndex=dict()
     campaignData=invertedIndex
     print options.name+" Refreshed campaign inverted index from http://user.impulse01.com:5003/index?channel=1"
+    del invertedIndex
+    del response
+    del http_client
+#-----------------------------------------------------------------------------------------------
 
+
+
+
+
+#---------------------Refresh Rules Database------------------------------------------------
 def refreshRules():
-    global rulesIndex
-    rulesTemp = autovivify(8, int)
+    thread.start_new_thread (refreshRulesThread, args[, kwargs] )
+
+def refreshRulesThread():    
+    global con
+    global cur
     http_client = tornado.httpclient.HTTPClient()
+    print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
     try:
 	response = http_client.fetch("http://user.impulse01.com:5003/rules?channel=1")
-	invertedIndex=json.loads(response.body)
+	rulesIndex=json.loads(response.body)
     except:
-	invertedIndex=dict()
-    for key in invertedIndex.keys():
-	value=invertedIndex[key]
+	rulesIndex=dict()
+    queryData=[]
+    for key in rulesIndex.keys():
 	sm=key.split("|")
-	rulesTemp[sm[0]][sm[1]][sm[2]][sm[3]][sm[4]][sm[5]][sm[6]][sm[7]]=value
-    rulesIndex=rulesTemp
+	for n,i in enumerate(sm):
+	  if i=='*':
+	    sm[n]=None
+	record = (sm[0],sm[1],sm[2],sm[3],sm[4],sm[5],sm[6],sm[7],(8-key.count("*")),json.dumps(rulesIndex[key]))
+	queryData.append(record)
+    cur.execute("DELETE FROM rules")
+    cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?)', queryData)    
+    print "inserted "+str(len(rulesIndex.keys()))+" records into rules table"
     print options.name+" Refreshed rules index from http://user.impulse01.com:5003/rules?channel=1"    
+    del response
+    del rulesIndex
+    del queryData
+    del sm
+    del record
+    del http_client
+#-----------------------------------------------------------------------------------------------
 
+
+
+
+
+#----------------------Initialize the Tornado Server --------------------------------
 define("port", default=8888, help="run on the given port", type=int)
 define("name", default="noname", help="name of the server")
 define("refreshCache", default=10000, help="millisecond interval between cache refresh", type=int)
@@ -178,6 +252,7 @@ define("rulesRefresh", default=10000, help="millisecond interval between rules r
 #sredisClient = tornadoredis.Client('cookie-tokyo.impulse01.com')
 #redisClient.connect()
 application = tornado.web.Application([(r".*", MainHandler),])
+#-----------------------------------------------------------------------------------------------
 
 
 
@@ -188,11 +263,13 @@ reader = csv.reader(location.split('\n'), delimiter=',')
 for row in reader:
   geoIndex[row[0]]={"Name":row[1], "Parent":row[3], "Type":row[5],"Country":row[4]}
 print options.name+" Loaded geoIndex from location.csv"
+del location
+del reader
 #-----------------------------------------------------------------------------------------------
 
 
 
-#---------------------Construct Inverted Index------------------------------------------------
+#---------------------Construct Campaign Index------------------------------------------------
 campaignData=dict()
 http_client = tornado.httpclient.HTTPClient()
 try:
@@ -202,26 +279,49 @@ except:
     invertedIndex=dict()
 campaignData=invertedIndex
 print options.name+" Loaded campaign inverted index from http://user.impulse01.com:5003/index?channel=1"
+del response
+del invertedIndex
 #-----------------------------------------------------------------------------------------------
 
 
 
-#-----------------------Construct the Rules Index ---------------------------------------------
-rulesIndex = autovivify(8, int)
+#-----------------------Construct the Rules Database ---------------------------------------------
 http_client = tornado.httpclient.HTTPClient()
 try:
     response = http_client.fetch("http://user.impulse01.com:5003/rules?channel=1")
-    invertedIndex=json.loads(response.body)
+    rulesIndex=json.loads(response.body)
 except:
-    invertedIndex=dict()
-for key in invertedIndex.keys():
-    value=invertedIndex[key]
+    rulesIndex=dict()
+print options.name+" Loaded rules index from http://user.impulse01.com:5003/rules?channel=1"
+print "total "+str(len(rulesIndex.keys()))+" rules"
+print "creating in-memory sqlite database"
+con = sqlite3.connect(":memory:")
+con.isolation_level = None
+cur = con.cursor()
+cur.execute('''CREATE TABLE rules (domain, city, state, weekday, hour, daypart,size,isp,dimensions,bids)''')
+cur.execute('CREATE INDEX ind ON rules(domain, city, state, weekday, hour, daypart,size,isp)')
+queryData=[]
+for key in rulesIndex.keys():
     sm=key.split("|")
-    rulesIndex[sm[0]][sm[1]][sm[2]][sm[3]][sm[4]][sm[5]][sm[6]][sm[7]]=value
-print options.name+" Loaded rules index from http://user.impulse01.com:5003/rules?channel=1"    
+    for n,i in enumerate(sm):
+      if i=='*':
+        sm[n]=None
+    record = (sm[0],sm[1],sm[2],sm[3],sm[4],sm[5],sm[6],sm[7],(8-key.count("*")),json.dumps(rulesIndex[key]))
+    queryData.append(record)
+cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?)', queryData)    
+print "inserted "+str(len(rulesIndex.keys()))+" records into rules table"
+print "created index on SQLite table rules"
+del rulesIndex
+del queryData
+del response
+del sm
+del http_client
 #-----------------------------------------------------------------------------------------------
 
-ruleSet = "1|*|*|*|*|*|*|*,*|2|*|*|*|*|*|*,*|*|3|*|*|*|*|*,*|*|*|4|*|*|*|*,*|*|*|*|5|*|*|*,*|*|*|*|*|6|*|*,*|*|*|*|*|*|7|*,*|*|*|*|*|*|*|8,1|2|*|*|*|*|*|*,1|*|3|*|*|*|*|*,1|*|*|4|*|*|*|*,1|*|*|*|5|*|*|*,1|*|*|*|*|6|*|*,1|*|*|*|*|*|7|*,1|*|*|*|*|*|*|8,*|2|3|*|*|*|*|*,*|2|*|4|*|*|*|*,*|2|*|*|5|*|*|*,*|2|*|*|*|6|*|*,*|2|*|*|*|*|7|*,*|2|*|*|*|*|*|8,*|*|3|4|*|*|*|*,*|*|3|*|5|*|*|*,*|*|3|*|*|6|*|*,*|*|3|*|*|*|7|*,*|*|3|*|*|*|*|8,*|*|*|4|5|*|*|*,*|*|*|4|*|6|*|*,*|*|*|4|*|*|7|*,*|*|*|4|*|*|*|8,*|*|*|*|5|6|*|*,*|*|*|*|5|*|7|*,*|*|*|*|5|*|*|8,*|*|*|*|*|6|7|*,*|*|*|*|*|6|*|8,*|*|*|*|*|*|7|8,1|2|3|*|*|*|*|*,1|2|*|4|*|*|*|*,1|2|*|*|5|*|*|*,1|2|*|*|*|6|*|*,1|2|*|*|*|*|7|*,1|2|*|*|*|*|*|8,1|*|3|4|*|*|*|*,1|*|3|*|5|*|*|*,1|*|3|*|*|6|*|*,1|*|3|*|*|*|7|*,1|*|3|*|*|*|*|8,1|*|*|4|5|*|*|*,1|*|*|4|*|6|*|*,1|*|*|4|*|*|7|*,1|*|*|4|*|*|*|8,1|*|*|*|5|6|*|*,1|*|*|*|5|*|7|*,1|*|*|*|5|*|*|8,1|*|*|*|*|6|7|*,1|*|*|*|*|6|*|8,1|*|*|*|*|*|7|8,*|2|3|4|*|*|*|*,*|2|3|*|5|*|*|*,*|2|3|*|*|6|*|*,*|2|3|*|*|*|7|*,*|2|3|*|*|*|*|8,*|2|*|4|5|*|*|*,*|2|*|4|*|6|*|*,*|2|*|4|*|*|7|*,*|2|*|4|*|*|*|8,*|2|*|*|5|6|*|*,*|2|*|*|5|*|7|*,*|2|*|*|5|*|*|8,*|2|*|*|*|6|7|*,*|2|*|*|*|6|*|8,*|2|*|*|*|*|7|8,*|*|3|4|5|*|*|*,*|*|3|4|*|6|*|*,*|*|3|4|*|*|7|*,*|*|3|4|*|*|*|8,*|*|3|*|5|6|*|*,*|*|3|*|5|*|7|*,*|*|3|*|5|*|*|8,*|*|3|*|*|6|7|*,*|*|3|*|*|6|*|8,*|*|3|*|*|*|7|8,*|*|*|4|5|6|*|*,*|*|*|4|5|*|7|*,*|*|*|4|5|*|*|8,*|*|*|4|*|6|7|*,*|*|*|4|*|6|*|8,*|*|*|4|*|*|7|8,*|*|*|*|5|6|7|*,*|*|*|*|5|6|*|8,*|*|*|*|5|*|7|8,*|*|*|*|*|6|7|8,1|2|3|4|*|*|*|*,1|2|3|*|5|*|*|*,1|2|3|*|*|6|*|*,1|2|3|*|*|*|7|*,1|2|3|*|*|*|*|8,1|2|*|4|5|*|*|*,1|2|*|4|*|6|*|*,1|2|*|4|*|*|7|*,1|2|*|4|*|*|*|8,1|2|*|*|5|6|*|*,1|2|*|*|5|*|7|*,1|2|*|*|5|*|*|8,1|2|*|*|*|6|7|*,1|2|*|*|*|6|*|8,1|2|*|*|*|*|7|8,1|*|3|4|5|*|*|*,1|*|3|4|*|6|*|*,1|*|3|4|*|*|7|*,1|*|3|4|*|*|*|8,1|*|3|*|5|6|*|*,1|*|3|*|5|*|7|*,1|*|3|*|5|*|*|8,1|*|3|*|*|6|7|*,1|*|3|*|*|6|*|8,1|*|3|*|*|*|7|8,1|*|*|4|5|6|*|*,1|*|*|4|5|*|7|*,1|*|*|4|5|*|*|8,1|*|*|4|*|6|7|*,1|*|*|4|*|6|*|8,1|*|*|4|*|*|7|8,1|*|*|*|5|6|7|*,1|*|*|*|5|6|*|8,1|*|*|*|5|*|7|8,1|*|*|*|*|6|7|8,*|2|3|4|5|*|*|*,*|2|3|4|*|6|*|*,*|2|3|4|*|*|7|*,*|2|3|4|*|*|*|8,*|2|3|*|5|6|*|*,*|2|3|*|5|*|7|*,*|2|3|*|5|*|*|8,*|2|3|*|*|6|7|*,*|2|3|*|*|6|*|8,*|2|3|*|*|*|7|8,*|2|*|4|5|6|*|*,*|2|*|4|5|*|7|*,*|2|*|4|5|*|*|8,*|2|*|4|*|6|7|*,*|2|*|4|*|6|*|8,*|2|*|4|*|*|7|8,*|2|*|*|5|6|7|*,*|2|*|*|5|6|*|8,*|2|*|*|5|*|7|8,*|2|*|*|*|6|7|8,*|*|3|4|5|6|*|*,*|*|3|4|5|*|7|*,*|*|3|4|5|*|*|8,*|*|3|4|*|6|7|*,*|*|3|4|*|6|*|8,*|*|3|4|*|*|7|8,*|*|3|*|5|6|7|*,*|*|3|*|5|6|*|8,*|*|3|*|5|*|7|8,*|*|3|*|*|6|7|8,*|*|*|4|5|6|7|*,*|*|*|4|5|6|*|8,*|*|*|4|5|*|7|8,*|*|*|4|*|6|7|8,*|*|*|*|5|6|7|8,1|2|3|4|5|*|*|*,1|2|3|4|*|6|*|*,1|2|3|4|*|*|7|*,1|2|3|4|*|*|*|8,1|2|3|*|5|6|*|*,1|2|3|*|5|*|7|*,1|2|3|*|5|*|*|8,1|2|3|*|*|6|7|*,1|2|3|*|*|6|*|8,1|2|3|*|*|*|7|8,1|2|*|4|5|6|*|*,1|2|*|4|5|*|7|*,1|2|*|4|5|*|*|8,1|2|*|4|*|6|7|*,1|2|*|4|*|6|*|8,1|2|*|4|*|*|7|8,1|2|*|*|5|6|7|*,1|2|*|*|5|6|*|8,1|2|*|*|5|*|7|8,1|2|*|*|*|6|7|8,1|*|3|4|5|6|*|*,1|*|3|4|5|*|7|*,1|*|3|4|5|*|*|8,1|*|3|4|*|6|7|*,1|*|3|4|*|6|*|8,1|*|3|4|*|*|7|8,1|*|3|*|5|6|7|*,1|*|3|*|5|6|*|8,1|*|3|*|5|*|7|8,1|*|3|*|*|6|7|8,1|*|*|4|5|6|7|*,1|*|*|4|5|6|*|8,1|*|*|4|5|*|7|8,1|*|*|4|*|6|7|8,1|*|*|*|5|6|7|8,*|2|3|4|5|6|*|*,*|2|3|4|5|*|7|*,*|2|3|4|5|*|*|8,*|2|3|4|*|6|7|*,*|2|3|4|*|6|*|8,*|2|3|4|*|*|7|8,*|2|3|*|5|6|7|*,*|2|3|*|5|6|*|8,*|2|3|*|5|*|7|8,*|2|3|*|*|6|7|8,*|2|*|4|5|6|7|*,*|2|*|4|5|6|*|8,*|2|*|4|5|*|7|8,*|2|*|4|*|6|7|8,*|2|*|*|5|6|7|8,*|*|3|4|5|6|7|*,*|*|3|4|5|6|*|8,*|*|3|4|5|*|7|8,*|*|3|4|*|6|7|8,*|*|3|*|5|6|7|8,*|*|*|4|5|6|7|8,1|2|3|4|5|6|*|*,1|2|3|4|5|*|7|*,1|2|3|4|5|*|*|8,1|2|3|4|*|6|7|*,1|2|3|4|*|6|*|8,1|2|3|4|*|*|7|8,1|2|3|*|5|6|7|*,1|2|3|*|5|6|*|8,1|2|3|*|5|*|7|8,1|2|3|*|*|6|7|8,1|2|*|4|5|6|7|*,1|2|*|4|5|6|*|8,1|2|*|4|5|*|7|8,1|2|*|4|*|6|7|8,1|2|*|*|5|6|7|8,1|*|3|4|5|6|7|*,1|*|3|4|5|6|*|8,1|*|3|4|5|*|7|8,1|*|3|4|*|6|7|8,1|*|3|*|5|6|7|8,1|*|*|4|5|6|7|8,*|2|3|4|5|6|7|*,*|2|3|4|5|6|*|8,*|2|3|4|5|*|7|8,*|2|3|4|*|6|7|8,*|2|3|*|5|6|7|8,*|2|*|4|5|6|7|8,*|*|3|4|5|6|7|8,1|2|3|4|5|6|7|*,1|2|3|4|5|6|*|8,1|2|3|4|5|*|7|8,1|2|3|4|*|6|7|8,1|2|3|*|5|6|7|8,1|2|*|4|5|6|7|8,1|*|3|4|5|6|7|8,*|2|3|4|5|6|7|8,1|2|3|4|5|6|7|8"
+
+
+india_tz = timezone('Asia/Kolkata')
+india_time = datetime.datetime.now(india_tz)
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
