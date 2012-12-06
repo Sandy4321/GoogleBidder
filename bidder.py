@@ -125,19 +125,18 @@ class MainHandler(tornado.web.RequestHandler):
 			ruleDict=dict()
 			hour=int(india_time.strftime('%H'))
 			if hour>=2 and hour<6:
-			  daypart=1
+			  daypart="1"
 			if hour>=6 and hour<10:
-			  daypart=2
+			  daypart="2"
 			if hour>=10 and hour<14:
-			  daypart=3
+			  daypart="3"
 			if hour>=14 and hour<18:
-			  daypart=4
+			  daypart="4"
 			if hour>=18 and hour<22:
-			  daypart=5
+			  daypart="5"
 			if hour>=22 and hour<2:
-			  daypart=6
-			  
-			print daypart
+			  daypart="6"
+			hour=str(hour)
 			weekday=india_time.strftime('%w')
 			if city=='':
 			  query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
