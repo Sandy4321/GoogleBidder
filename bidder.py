@@ -190,7 +190,7 @@ class MainHandler(tornado.web.RequestHandler):
 	
 #---------------------Refresh Campaign Index------------------------------------------------
 @tornado.web.asynchronous
-def refreshCache():
+def refreshCache(self):
     http_client = httpclient.AsyncHTTPClient()
     http_client.fetch("http://user.impulse01.com:5003/index?channel=1", callback=handleCacheFetch)
 
