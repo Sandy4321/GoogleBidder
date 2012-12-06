@@ -190,7 +190,7 @@ class MainHandler(tornado.web.RequestHandler):
 	
 #---------------------Refresh Campaign Index------------------------------------------------
 def refreshCache():
-    thread.start_new_thread (refreshCacheThread, args[, kwargs] )  
+    thread.start_new_thread (refreshCacheThread)  
 
 def refreshCacheThread():
     global campaignData
@@ -213,7 +213,7 @@ def refreshCacheThread():
 
 #---------------------Refresh Rules Database------------------------------------------------
 def refreshRules():
-    thread.start_new_thread (refreshRulesThread, args[, kwargs] )
+    thread.start_new_thread (refreshRulesThread)
 
 def refreshRulesThread():    
     global con
