@@ -184,7 +184,7 @@ class MainHandler(tornado.web.RequestHandler):
 		response.processing_time_ms=int((time.time()-start)*1000)
 		
 	    bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"] += 1
-	    if (time.time() - bidCountIndex["GoogleAdX"][domain]["DisplayWeb"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])>600:
+	    if (time.time() - bidCountIndex["GoogleAdX"][domain]["DisplayWeb"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])>10:
 	      i = bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]
 	      message = json.dumps({"messageType":"Forecast", "message":{"e":"GoogleAdX", "d":domain , "c":"DesktopDisplay" ,"geo":country.upper(),
 				      "size":str(ad.width[0])+'x'+str(ad.height[0]) , "i":i}})
@@ -193,6 +193,7 @@ class MainHandler(tornado.web.RequestHandler):
 	      sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 	      sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 	      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+	      print "sending inventory update package"
 	    
 	except:
 	    response = realtime_bidding_proto_pb2.BidResponse()
