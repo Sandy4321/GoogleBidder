@@ -192,7 +192,7 @@ class MainHandler(tornado.web.RequestHandler):
 	      message = json.dumps({"messageType":"Forecast", "message":{"e":"GoogleAdX", "d":domain , "c":"DesktopDisplay" ,"geo":country.upper(),
 				      "size":str(ad.width[0])+'x'+str(ad.height[0]) , "i":i}})
 	      bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]=0
-	      bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"]=time.time()
+	      bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"]=int(time.time())
 	      sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 	      sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 	      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
@@ -332,7 +332,7 @@ del sm
 del http_client
 #-----------------------------------------------------------------------------------------------
 
-bidCountIndex = autovivify(5, int)
+bidCountIndex = autovivify(6, int)
 india_tz = timezone('Asia/Kolkata')
 india_time = datetime.datetime.now(india_tz)
 
