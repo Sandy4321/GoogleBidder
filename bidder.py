@@ -189,7 +189,6 @@ class MainHandler(tornado.web.RequestHandler):
 	
 	
 #---------------------Refresh Campaign Index------------------------------------------------
-@tornado.web.asynchronous
 def refreshCache():
     global campaignData
     try:
