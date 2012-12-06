@@ -1,5 +1,5 @@
 #Real Time Bidding Engine for Google Ad Exchange
-#Sensitive code, lot of logics have been used at a lot of places. Changing might cause un-noticable bugs
+#Sensitive code, lot of logics have been used at different places. Changing might cause un-noticable bugs
 
 import sys, traceback
 import random
@@ -21,6 +21,7 @@ import tornado.gen
 import os
 import sqlite3
 import thread
+import socket
 import csv
 import realtime_bidding_proto_pb2
 from pytz import timezone
@@ -29,6 +30,10 @@ from urlparse import urlparse
 from tornado.web import asynchronous
 from collections import defaultdict
 from tornado.options import define, options
+
+#Address of the forecasting server
+UDP_IP = "46.137.241.79"
+UDP_PORT = 5006
 
 class MainHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
@@ -41,6 +46,7 @@ class MainHandler(tornado.web.RequestHandler):
 	global cur
 	global india_tz
 	global india_time
+	global bidCountIndex
         start = time.time()
         postContent = self.request.body
         bidRequest = realtime_bidding_proto_pb2.BidRequest()
@@ -176,6 +182,18 @@ class MainHandler(tornado.web.RequestHandler):
 	    else:
 		response = realtime_bidding_proto_pb2.BidResponse()
 		response.processing_time_ms=int((time.time()-start)*1000)
+		
+	    bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"] += 1
+	    if (time.time() - bidCountIndex["GoogleAdX"][domain]["DisplayWeb"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])>600:
+	      i = bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]
+	      message = json.dumps({"messageType":"Forecast", "message":{"e":"GoogleAdX", "d":domain , "c":"DesktopDisplay" ,"geo":country.upper(),
+				      "size":str(ad.width[0])+'x'+str(ad.height[0]) , "i":i}})
+	      bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]=0
+	      bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"]=time.time()
+	      sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	      sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+	      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+	    
 	except:
 	    response = realtime_bidding_proto_pb2.BidResponse()
 	    response.processing_time_ms=int((time.time()-start)*1000)
@@ -184,9 +202,10 @@ class MainHandler(tornado.web.RequestHandler):
         responseString = response.SerializeToString()
 	self.write(responseString)
 	self.finish()
-	
 
-	
+def autovivify(levels=1, final=dict):
+    return (defaultdict(final) if levels < 2 else defaultdict(lambda: autovivify(levels – 1, final)))
+
 	
 #---------------------Refresh Campaign Index------------------------------------------------
 def refreshCache():
@@ -309,8 +328,7 @@ del sm
 del http_client
 #-----------------------------------------------------------------------------------------------
 
-
-
+bidCountIndex = autovivify(5, int)
 india_tz = timezone('Asia/Kolkata')
 india_time = datetime.datetime.now(india_tz)
 
