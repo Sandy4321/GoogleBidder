@@ -32,6 +32,13 @@ conn.request("POST", "/getbid", requestString,headers)
 response = conn.getresponse()
 print response.status, response.reason
 data = response.read()
-print data
+response = realtime_bidding_proto_pb2.BidResponse()
+response.ParseFromString(data)
+advertiserName = response.ad[0].advertiser_name[0]
+bid = response.ad[0].adslot[0].max_cpm_micros
+creative=response.ad[0].buyer_creative_id
+clickUrl=response.ad[0].click_through_url
+
+
 
 conn.close()

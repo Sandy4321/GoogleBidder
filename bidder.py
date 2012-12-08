@@ -187,7 +187,6 @@ class MainHandler(tornado.web.RequestHandler):
 				newCampList.append(camp)
 
 			    print "Debug: Campaigns after overriding rules"+str(newCampList)
-				
 			    #Now start qualifying campaigns top-down by bids for pacing. If a campaign qualifies, choose it as a final candidate
 			    finalCampaign=0
 			    for camp in newCampList:
@@ -199,7 +198,9 @@ class MainHandler(tornado.web.RequestHandler):
 				    break
 				else:
 				    print "Debug: Campaign "+str(camp[0])+" did not qualify"				  
-				
+
+			    response.debugString=str(finalCampaign)
+			    
 			    if finalCampaign>0:
 			        print "Debug: Campaign "+str(finalCampaign)+" proceeding to bid"
 				banners = campaignData['display:campaign:'+str(finalCampaign)+':'+str(ad.width[0])+'x'+str(ad.height[0])]
