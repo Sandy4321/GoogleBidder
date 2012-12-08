@@ -158,8 +158,8 @@ class MainHandler(tornado.web.RequestHandler):
 			    #Loop over qualified campaigns and override the default bids with new bids from rules database
 			    newCampList=[]
 			    for camp in camplist:
-				if str(camp[0]) in rulesDict.keys():
-				    camp[1]=float(rulesDict[str(camp[0])])
+				if str(camp[0]) in ruleDict.keys():
+				    camp[1]=float(ruleDict[str(camp[0])])
 				newCampList.append(camp)
 			      
 			    #Now start qualifying campaigns top-down by bids for pacing. If a campaign qualifies, choose it as a final candidate

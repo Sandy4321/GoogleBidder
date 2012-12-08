@@ -25,12 +25,13 @@ print request
 requestString = request.SerializeToString()
 
 conn = httplib.HTTPConnection("124.248.207.109:8888")
-for i in range(1000):
-  print "making request "+str(i)
-  conn.request("POST", "/getbid", requestString)
-  response = conn.getresponse()
-  print response.status, response.reason
-  data = response.read()
-  print data
+#for i in range(1000):
+print "making request "
+headers = {"Content-type": "application/octet-stream","Accept": "application/octet-stream"}
+conn.request("POST", "/getbid", requestString,headers)
+response = conn.getresponse()
+print response.status, response.reason
+data = response.read()
+print data
 
 conn.close()
