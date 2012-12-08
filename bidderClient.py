@@ -7,7 +7,7 @@ import random
 
 url="http://moneycontrol.com"
 geo_criteria_id = 1007751
-size=[[120,600],[160,600],[300,250],[728,90]]
+size=[[300,250]]
 
 request = realtime_bidding_proto_pb2.BidRequest()
 request.id="1112"

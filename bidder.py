@@ -107,14 +107,14 @@ class MainHandler(tornado.web.RequestHandler):
 			
 			ronCampaigns = list(set(ronCampaigns) - set(black))			
 			
-			print "Debug: Final Ron Campaigns"+str(ronCampaigns)
+			print "Debug: Ron Campaigns after black filtering"+str(ronCampaigns)
 			
 			try:
 			    whiteCampaigns = campaignData['display:white:'+domain]
 			except KeyError:
 			    whiteCampaigns = list()
 
-			print "Debug: Final White Campaigns"+str(whiteCampaigns)
+			print "Debug: White Campaigns"+str(whiteCampaigns)
 
 			campaigns = list(set(audienceCampaigns+ronCampaigns+whiteCampaigns))
 			
@@ -171,7 +171,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    cur.execute(query)
 			    rows=cur.fetchall()
 			    
-			    print "Debug: Matching rules "+len(rows)			    
+			    print "Debug: Matching rules "+str(len(rows))
 			    for row in rows:
 				rules=json.loads(row[9])
 				for key in rules.keys():
