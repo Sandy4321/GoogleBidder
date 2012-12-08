@@ -145,9 +145,9 @@ class MainHandler(tornado.web.RequestHandler):
 			    hour=str(hour)
 			    weekday=india_time.strftime('%w')
 			    if city=='':
-				query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
+				query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) ORDER BY dimensions ASC"
 			    else:
-				query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND city IS NULL AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) AND (isp='"+isp+"' OR isp IS NULL) ORDER BY dimensions ASC"
+				query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND city IS NULL AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) ORDER BY dimensions ASC"
 			    cur.execute(query)
 			    rows=cur.fetchall()
 			    for row in rows:
@@ -255,10 +255,10 @@ def refreshRules():
 	for n,i in enumerate(sm):
 	    if i=='*':
 		sm[n]=None
-	record = (sm[0],sm[1],sm[2],sm[3],sm[4],sm[5],sm[6],sm[7],(8-key.count("*")),json.dumps(rulesIndex[key]))
+	record = (sm[0],sm[1],sm[2],sm[3],sm[4],sm[5],sm[6],(8-key.count("*")),json.dumps(rulesIndex[key]))
 	queryData.append(record)
     cur.execute("DELETE FROM rules")
-    cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?)', queryData)    
+    cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?)', queryData)    
     print "inserted "+str(len(rulesIndex.keys()))+" records into rules table"
     print options.name+" Refreshed rules index from http://user.impulse01.com:5003/rules?channel=1"    
 #-----------------------------------------------------------------------------------------------
@@ -321,8 +321,8 @@ print "creating in-memory sqlite database"
 con = sqlite3.connect(":memory:")
 con.isolation_level = None
 cur = con.cursor()
-cur.execute('''CREATE TABLE rules (domain, city, state, weekday, hour, daypart,size,isp,dimensions,bids)''')
-cur.execute('CREATE INDEX ind ON rules(domain, city, state, weekday, hour, daypart,size,isp)')
+cur.execute('''CREATE TABLE rules (domain, city, state, weekday, hour, daypart,size,dimensions,bids)''')
+cur.execute('CREATE INDEX ind ON rules(domain, city, state, weekday, hour, daypart,size)')
 queryData=[]
 for key in rulesIndex.keys():
     sm=key.split("|")
