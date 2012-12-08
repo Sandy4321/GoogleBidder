@@ -1,5 +1,7 @@
 #Real Time Bidding Engine for Google Ad Exchange
 #Sensitive code, lot of logics have been used at different places. Changing might cause un-noticable bugs
+#Copyright(C) - Impulse Media Private Limited
+#Authored - Aditya Singh and Phaneendra Hegde
 
 import sys, traceback
 import random
@@ -173,12 +175,15 @@ class MainHandler(tornado.web.RequestHandler):
 				banners = campaignData['display:campaign:'+str(finalCampaign)+':'+str(ad.width[0])+'x'+str(ad.height[0])]
 				randomBannerId = random.choice(banners)
 				bidMicros = finalBid * 1000000
-				info = base64.b64encode(json.dumps({'e':'GOOGLE','d':domain,'bid':randomBannerId,'cid':finalCampaign}))
+				info = base64.b64encode(json.dumps({'e':'google','impid':base64.base64encode(bidRequest.id),'d':domain,'bid':randomBannerId,'cid':finalCampaign, 'b':finalBid}))
 				info = info.replace("+","-").replace("/","_").replace("=","")
-				code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p={WINNING_PRICE}&r={RANDOM}&red={CLICKURL}" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'
+				code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p=%%WINNING_PRICE%%&r=%%CACHEBUSTER%%&red=%%CLICK_URL_UNESC%%" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'
 				responsead = response.ad.add()
 				responsead.html_snippet = code
-				responsead.creative_id= randomBannerId
+				responsead.buyer_creative_id= randomBannerId
+				responsead.advertiser_name.append(campaignData['display:campaign:'+str(finalCampaign)+':advertiserName'])
+				responsead.attribute.append(2)
+				responsead.category.append(0)
 				responsead.click_through_url.append(campaignData['display:campaign:'+str(finalCampaign)+':url'])
 				responseAdSlot = responsead.adslot.add()
 				responseAdSlot.id=ad.id
