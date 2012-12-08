@@ -331,7 +331,7 @@ for key in rulesIndex.keys():
 	    sm[n]=None
     record = (sm[0],sm[1],sm[2],sm[3],sm[4],sm[5],sm[6],sm[7],(8-key.count("*")),json.dumps(rulesIndex[key]))
     queryData.append(record)
-cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?,?)', queryData)    
+cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?)', queryData)    
 print "inserted "+str(len(rulesIndex.keys()))+" records into rules table"
 print "created index on SQLite table rules"
 del rulesIndex
