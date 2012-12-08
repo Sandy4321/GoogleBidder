@@ -198,12 +198,12 @@ class MainHandler(tornado.web.RequestHandler):
 			    for camp in newCampList:
 				r=random.randrange(1,100)
 				if r<camp[2]:
-				    print "Debug: Campaign "+str(camp[0])+" Qualified for bidding"
+				    #print "Debug: Campaign "+str(camp[0])+" Qualified for bidding"
 				    finalCampaign=camp[0]
 				    finalBid=camp[1]
 				    break
 				else:
-				    print "Debug: Campaign "+str(camp[0])+" did not qualify"			    
+				    #print "Debug: Campaign "+str(camp[0])+" did not qualify"			    
 
 			    response.debug_string=str(finalCampaign)
 			    
