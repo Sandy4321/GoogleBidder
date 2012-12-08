@@ -120,7 +120,11 @@ class MainHandler(tornado.web.RequestHandler):
 			
 			print "Debug: All Campaigns"+str(campaigns)			
 			
-			geoCampaigns = campaignData['display:geo:'+country]
+			try:
+			    geoCampaigns = campaignData['display:geo:'+country]
+			except KeyError:
+			    geoCampaigns = list()
+			    
 			campaigns = list(set(geoCampaigns) & set(campaigns))
 			
 			print "Debug: All Campaigns After geo filtering"+str(campaigns)
@@ -173,7 +177,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    
 			    print "Debug: Matching rules "+str(len(rows))
 			    for row in rows:
-				rules=json.loads(row[9])
+				rules=json.loads(row[8])
 				for key in rules.keys():
 				    ruleDict[key]=float(rules[key])
 				    
