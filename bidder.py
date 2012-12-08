@@ -201,9 +201,7 @@ class MainHandler(tornado.web.RequestHandler):
 				    #print "Debug: Campaign "+str(camp[0])+" Qualified for bidding"
 				    finalCampaign=camp[0]
 				    finalBid=camp[1]
-				    break
-				else:
-				    #print "Debug: Campaign "+str(camp[0])+" did not qualify"			    
+				    break			    
 
 			    response.debug_string=str(finalCampaign)
 			    
