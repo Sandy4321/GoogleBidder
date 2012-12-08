@@ -74,7 +74,7 @@ class MainHandler(tornado.web.RequestHandler):
 			state=geoIndex[str(geo_criteria_id)]["Name"].lower()
 			city=""
 
-		print "Debug: Got request for "+domain+" from city "+city+" , state "+state
+		#print "Debug: Got request for "+domain+" from city "+city+" , state "+state
 		
 		if not bidRequest.HasField("anonymous_id") and not bidRequest.HasField("mobile") and not bidRequest.HasField("video") and not bidRequest.is_ping:
 		    #segments = yield tornado.gen.Task(redisClient.smembers,'user:'+bidRequest.google_user_id)
@@ -83,7 +83,7 @@ class MainHandler(tornado.web.RequestHandler):
 		    response = realtime_bidding_proto_pb2.BidResponse()
 
 		    for ad in adSlots:
-		        print "Debug: Evaluating ad slot "+str(ad)
+		        #print "Debug: Evaluating ad slot "+str(ad)
 			if segments:
 			    for seg in segments:
 				try:
@@ -98,27 +98,27 @@ class MainHandler(tornado.web.RequestHandler):
 			except KeyError:
 			    ronCampaigns = list()
 
-			print "Debug: Ron Campaigns"+str(ronCampaigns)
+			#print "Debug: Ron Campaigns"+str(ronCampaigns)
 			try:
 			    black = campaignData['display:roe:black:'+domain]		#ROE Campaigns with this domain as blacklist
 			except KeyError:
 			    black = list()
-			print "Debug: Ron Blacklisted Campaigns"+str(black)
+			#print "Debug: Ron Blacklisted Campaigns"+str(black)
 			
 			ronCampaigns = list(set(ronCampaigns) - set(black))			
 			
-			print "Debug: Ron Campaigns after black filtering"+str(ronCampaigns)
+			#print "Debug: Ron Campaigns after black filtering"+str(ronCampaigns)
 			
 			try:
 			    whiteCampaigns = campaignData['display:white:'+domain]
 			except KeyError:
 			    whiteCampaigns = list()
 
-			print "Debug: White Campaigns"+str(whiteCampaigns)
+			#print "Debug: White Campaigns"+str(whiteCampaigns)
 
 			campaigns = list(set(audienceCampaigns+ronCampaigns+whiteCampaigns))
 			
-			print "Debug: All Campaigns"+str(campaigns)			
+			#print "Debug: All Campaigns"+str(campaigns)			
 			
 			try:
 			    geoCampaigns = campaignData['display:geo:'+country]
@@ -127,7 +127,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    
 			campaigns = list(set(geoCampaigns) & set(campaigns))
 			
-			print "Debug: All Campaigns After geo filtering"+str(campaigns)
+			#print "Debug: All Campaigns After geo filtering"+str(campaigns)
 			
 			size=str(ad.width[0])+"x"+str(ad.height[0])
 			try:
@@ -137,7 +137,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    
 			campaigns = list(set(sizeCampaigns) & set(campaigns))
 
-			print "Debug: All Campaigns After size filtering"+str(campaigns)
+			#print "Debug: All Campaigns After size filtering"+str(campaigns)
 
 			if(len(campaigns)>0):
 			    camplist=[]
@@ -145,7 +145,7 @@ class MainHandler(tornado.web.RequestHandler):
 				l = [camp, campaignData["display:campaign:"+str(camp)+":bid"],campaignData["display:campaign:"+str(camp)+":pacing"]]
 				camplist.append(l)
 				
-			    print "Debug: Campaign List"+str(camplist)		    
+			    #print "Debug: Campaign List"+str(camplist)		    
 
 			    #Retrieve rules from SQLLite and create rule dictionary
 			    ruleDict=dict()
@@ -172,13 +172,13 @@ class MainHandler(tornado.web.RequestHandler):
 			    cur.execute(query)
 			    rows=cur.fetchall()
 			    
-			    print "Debug: Matching rules "+str(len(rows))
+			    #print "Debug: Matching rules "+str(len(rows))
 			    for row in rows:
 				rules=json.loads(row[8])
 				for key in rules.keys():
 				    ruleDict[key]=float(rules[key])
 				    
-			    print "Debug: New bids after applying rules"+str(ruleDict)
+			    #print "Debug: New bids after applying rules"+str(ruleDict)
 
 			    #Loop over qualified campaigns and override the default bids with new bids from rules database
 			    newCampList=[]
@@ -187,11 +187,11 @@ class MainHandler(tornado.web.RequestHandler):
 				    camp[1]=float(ruleDict[str(camp[0])])
 				newCampList.append(camp)
 				
-			    print "Debug: Campaign bids after overriding rules"+str(newCampList)
+			    #print "Debug: Campaign bids after overriding rules"+str(newCampList)
 
 			    newCampList.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending by bids
 			    
-			    print "Debug: Campaign List After Sorting by bids"+str(newCampList)	
+			    #print "Debug: Campaign List After Sorting by bids"+str(newCampList)	
 
 			    #Now start qualifying campaigns top-down by bids for pacing. If a campaign qualifies, choose it as a final candidate
 			    finalCampaign=0
@@ -247,7 +247,6 @@ class MainHandler(tornado.web.RequestHandler):
 		response.processing_time_ms=int((time.time()-start)*1000)
 		traceback.print_exc(file=sys.stdout)
 
-	    print response
 	    responseString = response.SerializeToString()
 	    self.write(responseString)
 	    self.finish()
