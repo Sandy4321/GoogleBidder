@@ -206,10 +206,10 @@ class MainHandler(tornado.web.RequestHandler):
 			    response.debug_string=str(finalCampaign)
 			    
 			    if finalCampaign>0:
-			        print "Debug: Campaign "+str(finalCampaign)+" proceeding to bid"
+			        #print "Debug: Campaign "+str(finalCampaign)+" proceeding to bid"
 				banners = campaignData['display:campaign:'+str(finalCampaign)+':'+str(ad.width[0])+'x'+str(ad.height[0])]
 				randomBannerId = random.choice(banners)
-				print "Debug: Choosen creative"+str(randomBannerId)
+				#print "Debug: Choosen creative"+str(randomBannerId)
 				bidMicros = finalBid * 1000000
 				info = base64.b64encode(json.dumps({'e':'google','impid':base64.b64encode(bidRequest.id),'d':domain,'bid':randomBannerId,'cid':finalCampaign, 'b':finalBid}))
 				info = info.replace("+","-").replace("/","_").replace("=","")
