@@ -211,7 +211,7 @@ class MainHandler(tornado.web.RequestHandler):
 				code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p=%%WINNING_PRICE%%&r=%%CACHEBUSTER%%&red=%%CLICK_URL_UNESC%%" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'
 				responsead = response.ad.add()
 				responsead.html_snippet = code
-				responsead.buyer_creative_id= randomBannerId
+				responsead.buyer_creative_id= str(randomBannerId)
 				responsead.advertiser_name.append(campaignData['display:campaign:'+str(finalCampaign)+':advertiserName'])
 				responsead.attribute.append(2)
 				responsead.category.append(0)
