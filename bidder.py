@@ -165,7 +165,7 @@ class MainHandler(tornado.web.RequestHandler):
 				daypart="4"
 			    if hour>=18 and hour<22:
 				daypart="5"
-			    if hour>=22 and hour<2:
+			    if hour>=22 or hour<2:
 				daypart="6"
 			    hour=str(hour)
 			    weekday=india_time.strftime('%w')
