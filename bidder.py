@@ -145,11 +145,7 @@ class MainHandler(tornado.web.RequestHandler):
 				l = [camp, campaignData["display:campaign:"+str(camp)+":bid"],campaignData["display:campaign:"+str(camp)+":pacing"]]
 				camplist.append(l)
 				
-			    print "Debug: Campaign List"+str(camplist)
-
-			    camplist.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending by bids
-			    
-			    print "Debug: Campaign List After Sorting"+str(camplist)			    
+			    print "Debug: Campaign List"+str(camplist)		    
 
 			    #Retrieve rules from SQLLite and create rule dictionary
 			    ruleDict=dict()
@@ -182,7 +178,7 @@ class MainHandler(tornado.web.RequestHandler):
 				for key in rules.keys():
 				    ruleDict[key]=float(rules[key])
 				    
-			    print "Debug: New bids after applying rules"+str(ruleDict)				    
+			    print "Debug: New bids after applying rules"+str(ruleDict)
 
 			    #Loop over qualified campaigns and override the default bids with new bids from rules database
 			    newCampList=[]
@@ -190,8 +186,13 @@ class MainHandler(tornado.web.RequestHandler):
 				if str(camp[0]) in ruleDict.keys():
 				    camp[1]=float(ruleDict[str(camp[0])])
 				newCampList.append(camp)
+				
+			    print "Debug: Campaign bids after overriding rules"+str(newCampList)
 
-			    print "Debug: Campaigns after overriding rules"+str(newCampList)
+			    newCampList.sort(key=operator.itemgetter(1), reverse=True) # sorts the list in place decending by bids
+			    
+			    print "Debug: Campaign List After Sorting by bids"+str(newCampList)	
+
 			    #Now start qualifying campaigns top-down by bids for pacing. If a campaign qualifies, choose it as a final candidate
 			    finalCampaign=0
 			    for camp in newCampList:
@@ -202,7 +203,7 @@ class MainHandler(tornado.web.RequestHandler):
 				    finalBid=camp[1]
 				    break
 				else:
-				    print "Debug: Campaign "+str(camp[0])+" did not qualify"				  
+				    print "Debug: Campaign "+str(camp[0])+" did not qualify"			    
 
 			    response.debug_string=str(finalCampaign)
 			    

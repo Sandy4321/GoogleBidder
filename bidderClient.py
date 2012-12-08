@@ -13,7 +13,7 @@ for row in reader:
 
 
 #urllist=["http://investmentyogi.com","http://ndtv.com" ,"http://sulekha.com","http://amfimutualfund.com","http://apnapaisa.com","http://sify.com","http://holidayiq.com","http://indiatimes.com","http://sharetipsinfo.com","http://myzamana.com","http://ehow.com","http://mutualfundsnavindia.com","http://firstpost.com","http://appuonline.com"]
-urllist=["http://appuonline.com"]
+urllist=["http://appuonline.com","http://holidayiq.com"]
 
 geo_criteria_id=[1007751,1007753,1007765,1007772,1007788,1007805,1007809,1007809,9040183]
 size=[[300,250],[160,600],[728,90],[120,600]]
