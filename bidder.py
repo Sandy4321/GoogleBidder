@@ -267,7 +267,6 @@ def refreshCache():
         invertedIndex=dict()
     campaignData=invertedIndex
     print options.name+" Refreshed campaign inverted index from http://terminal.impulse01.com:5003/index?channel=1"
-    del invertedIndex
 #-----------------------------------------------------------------------------------------------
 
 
@@ -322,8 +321,6 @@ reader = csv.reader(location.split('\n'), delimiter=',')
 for row in reader:
     geoIndex[row[0]]={"Name":row[1], "Parent":row[3], "Type":row[5],"Country":row[4]}
 print options.name+" Loaded geoIndex from location.csv"
-del location
-del reader
 #-----------------------------------------------------------------------------------------------
 
 
@@ -338,8 +335,7 @@ except:
     invertedIndex=dict()
 campaignData=invertedIndex
 print options.name+" Loaded campaign inverted index from http://terminal.impulse01.com:5003/index?channel=1"
-del response
-del invertedIndex
+
 #-----------------------------------------------------------------------------------------------
 
 
@@ -370,11 +366,6 @@ for key in rulesIndex.keys():
 cur.executemany('INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?)', queryData)    
 print "inserted "+str(len(rulesIndex.keys()))+" records into rules table"
 print "created index on SQLite table rules"
-del rulesIndex
-del queryData
-del response
-del sm
-del http_client
 #-----------------------------------------------------------------------------------------------
 
 bidCountIndex = autovivify(6, int)
