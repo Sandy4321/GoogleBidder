@@ -261,12 +261,12 @@ def refreshCache():
     global campaignData
     http_client = tornado.httpclient.HTTPClient()
     try:
-	response = http_client.fetch("http://user.impulse01.com:5003/index?channel=1")
+	response = http_client.fetch("http://terminal.impulse01.com:5003/index?channel=1")
 	invertedIndex=json.loads(response.body)
     except:
         invertedIndex=dict()
     campaignData=invertedIndex
-    print options.name+" Refreshed campaign inverted index from http://user.impulse01.com:5003/index?channel=1"
+    print options.name+" Refreshed campaign inverted index from http://terminal.impulse01.com:5003/index?channel=1"
     del invertedIndex
 #-----------------------------------------------------------------------------------------------
 
@@ -280,11 +280,11 @@ def refreshRules():
     global cur  
     http_client = tornado.httpclient.HTTPClient()
     try:
-	response = http_client.fetch("http://user.impulse01.com:5003/rules?channel=1")
+	response = http_client.fetch("http://terminal.impulse01.com:5003/rules?channel=1")
 	rulesIndex=json.loads(response.body)
     except:
 	rulesIndex=dict()
-    print options.name+" is fetching new rules from http://user.impulse01.com:5003/rules?channel=1"    
+    print options.name+" is fetching new rules from http://terminal.impulse01.com:5003/rules?channel=1"    
     queryData=[]
     for key in rulesIndex.keys():
 	sm=key.split("|")
@@ -332,12 +332,12 @@ del reader
 campaignData=dict()
 http_client = tornado.httpclient.HTTPClient()
 try:
-    response = http_client.fetch("http://user.impulse01.com:5003/index?channel=1")
+    response = http_client.fetch("http://terminal.impulse01.com:5003/index?channel=1")
     invertedIndex=json.loads(response.body)
 except:
     invertedIndex=dict()
 campaignData=invertedIndex
-print options.name+" Loaded campaign inverted index from http://user.impulse01.com:5003/index?channel=1"
+print options.name+" Loaded campaign inverted index from http://terminal.impulse01.com:5003/index?channel=1"
 del response
 del invertedIndex
 #-----------------------------------------------------------------------------------------------
@@ -347,11 +347,11 @@ del invertedIndex
 #-----------------------Construct the Rules Database ---------------------------------------------
 http_client = tornado.httpclient.HTTPClient()
 try:
-    response = http_client.fetch("http://user.impulse01.com:5003/rules?channel=1")
+    response = http_client.fetch("http://terminal.impulse01.com:5003/rules?channel=1")
     rulesIndex=json.loads(response.body)
 except:
     rulesIndex=dict()
-print options.name+" Loaded rules index from http://user.impulse01.com:5003/rules?channel=1"
+print options.name+" Loaded rules index from http://terminal.impulse01.com:5003/rules?channel=1"
 print "total "+str(len(rulesIndex.keys()))+" rules"
 print "creating in-memory sqlite database"
 con = sqlite3.connect(":memory:")

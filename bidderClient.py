@@ -13,8 +13,7 @@ for row in reader:
 
 
 #urllist=["http://investmentyogi.com","http://ndtv.com" ,"http://sulekha.com","http://amfimutualfund.com","http://apnapaisa.com","http://sify.com","http://holidayiq.com","http://indiatimes.com","http://sharetipsinfo.com","http://myzamana.com","http://ehow.com","http://mutualfundsnavindia.com","http://firstpost.com","http://appuonline.com"]
-urllist=["http://appuonline.com","http://holidayiq.com"]
-
+urllist=["http://investmentyogi.com","http://ndtv.com","http://mutualfundsnavindia.com","http://bseindia.com","http://moneycontrol.com","http://onemint.com","http://apnapaisa.com"]
 geo_criteria_id=[1007751,1007753,1007765,1007772,1007788,1007805,1007809,1007809,9040183]
 size=[[300,250],[160,600],[728,90],[120,600]]
 allbids="Url, Width, Height, GeoCountry, GeoState, GeoCity, Campaign, Bid, Creative, Advertiser"
@@ -61,9 +60,10 @@ for i in range(100):
     creative=int(response.ad[0].buyer_creative_id)
     clickUrl=response.ad[0].click_through_url
     campaignId=int(response.debug_string)
-    msg = url+","+str(b[0])+","+str(b[1])+","+str(country)+","+str(state)+","+str(city)+","+str(campaignId)+","+str(bid)+","+str(creative)+","+advertiserName
+    html = response.ad[0].html_snippet
+    msg = url+","+str(b[0])+","+str(b[1])+","+str(country)+","+str(state)+","+str(city)+","+str(campaignId)+","+str(bid)+","+str(creative)+","+advertiserName+","+html
   else:
-    msg = url+","+str(b[0])+","+str(b[1])+","+str(country)+","+str(state)+","+str(city)+",,,,"
+    msg = url+","+str(b[0])+","+str(b[1])+","+str(country)+","+str(state)+","+str(city)+",,,,,"
   print msg
   allbids=allbids+"\n"+msg
 
