@@ -11,14 +11,13 @@ reader = csv.reader(location.split('\n'), delimiter=',')
 for row in reader:
     geoIndex[row[0]]={"Name":row[1], "Parent":row[3], "Type":row[5],"Country":row[4]}
 
-
 #urllist=["http://investmentyogi.com","http://ndtv.com" ,"http://sulekha.com","http://amfimutualfund.com","http://apnapaisa.com","http://sify.com","http://holidayiq.com","http://indiatimes.com","http://sharetipsinfo.com","http://myzamana.com","http://ehow.com","http://mutualfundsnavindia.com","http://firstpost.com","http://appuonline.com"]
-urllist=["http://investmentyogi.com","http://ndtv.com","http://mutualfundsnavindia.com","http://bseindia.com","http://moneycontrol.com","http://onemint.com","http://apnapaisa.com"]
+urllist=["http://bankingawareness.com","http://bankifsccode.com","http://lawyersclubindia.com","http://simpletaxindia.net","http://moneycontrol.com","http://onemint.com","http://apnapaisa.com"]
 geo_criteria_id=[1007751,1007753,1007765,1007772,1007788,1007805,1007809,1007809,9040183]
 size=[[300,250],[160,600],[728,90],[120,600]]
 allbids="Url, Width, Height, GeoCountry, GeoState, GeoCity, Campaign, Bid, Creative, Advertiser"
 
-conn = httplib.HTTPConnection("124.248.207.109:8888")
+conn = httplib.HTTPConnection("bid-hk.impulse01.com",80)
 for i in range(100):
   request = realtime_bidding_proto_pb2.BidRequest()
   request.id="1112"
