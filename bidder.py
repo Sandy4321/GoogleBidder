@@ -147,7 +147,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    #Retrieve rules from SQLLite and create rule dictionary
 			    ruleDict=dict()
 			    hour=int(datetime.datetime.now().strftime('%H'))
-			    print "Debug: hour="+str(hour)
+			    #print "Debug: hour="+str(hour)
 			    if hour>=2 and hour<6:
 				daypart="1"
 			    if hour>=6 and hour<10:
@@ -371,5 +371,5 @@ if __name__ == "__main__":
     tornado.options.parse_command_line()
     application.listen(options.port)
     tornado.ioloop.PeriodicCallback(refreshCache, options.refreshCache).start()
-    tornado.ioloop.PeriodicCallback(refreshRules, options.refreshCache).start()
+    tornado.ioloop.PeriodicCallback(refreshRules, options.rulesRefresh).start()
     tornado.ioloop.IOLoop.instance().start()     
