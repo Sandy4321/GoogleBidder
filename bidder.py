@@ -49,8 +49,6 @@ class MainHandler(tornado.web.RequestHandler):
 	    global ruleSet
 	    global con
 	    global cur
-	    global india_tz
-	    global india_time
 	    global bidCountIndex
 	    start = time.time()
 	    postContent = self.request.body
@@ -148,8 +146,8 @@ class MainHandler(tornado.web.RequestHandler):
 
 			    #Retrieve rules from SQLLite and create rule dictionary
 			    ruleDict=dict()
-			    hour=int(india_time.strftime('%H'))
-			    #print "Debug: hour="+str(hour)
+			    hour=int(datetime.datetime.now().strftime('%H'))
+			    print "Debug: hour="+str(hour)
 			    if hour>=2 and hour<6:
 				daypart="1"
 			    if hour>=6 and hour<10:
@@ -163,7 +161,7 @@ class MainHandler(tornado.web.RequestHandler):
 			    if hour>=22 or hour<2:
 				daypart="6"
 			    hour=str(hour)
-			    weekday=india_time.strftime('%w')
+			    weekday=datetime.datetime.now().strftime('%w')
 			    if city=='':
 				query = "SELECT * FROM rules WHERE (domain='"+domain+"' OR domain IS NULL) AND (city='"+city+"' OR city IS NULL) AND (state='"+state+"' OR state IS NULL) AND (weekday='"+weekday+"' OR weekday IS NULL) AND (hour='"+hour+"' OR hour IS NULL) AND (daypart='"+daypart+"' OR daypart IS NULL) AND (size='"+size+"' OR size IS NULL) ORDER BY dimensions ASC"
 			    else:
@@ -368,8 +366,6 @@ print "created index on SQLite table rules"
 #-----------------------------------------------------------------------------------------------
 
 bidCountIndex = autovivify(6, int)
-india_tz = timezone('Asia/Kolkata')
-india_time = datetime.datetime.now(india_tz)
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
