@@ -3,6 +3,8 @@
 #Copyright(C) - Impulse Media Private Limited
 #Authored - Aditya Singh and Phaneendra Hegde
 #INSTALL-Tornado, Protocol Buffers C++ Library
+#Start multiple processes of this app (~ 1 per core) and load balance them with nginx
+
 import sys, traceback
 import random
 import time  
@@ -24,7 +26,7 @@ import os
 import sqlite3
 import thread
 import socket
-import csv
+import csvtime.time()
 import realtime_bidding_proto_pb2
 from pyDes import *
 from urlparse import urlparse
