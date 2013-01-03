@@ -33,7 +33,7 @@ from collections import defaultdict
 from tornado.options import define, options
 
 #Address of the forecasting server
-UDP_IP = "46.137.241.79"
+UDP_IP = "180.179.212.15"
 UDP_PORT = 5006
 
 class MainHandler(tornado.web.RequestHandler):
@@ -222,6 +222,8 @@ class MainHandler(tornado.web.RequestHandler):
 				responseAdSlot.id=ad.id
 				responseAdSlot.max_cpm_micros=int(bidMicros)
 		    response.processing_time_ms=int((time.time()-start)*1000)
+		    
+		    print sys.getsizeof(bidCountIndex)
 		    bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"] += 1
 		    if int(time.time() - bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])>10:
 		      i = bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]
