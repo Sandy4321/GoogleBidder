@@ -9,6 +9,8 @@ geoIndex=dict()
 location = open("location.csv","r").read()
 reader = csv.reader(location.split('\n'), delimiter=',')
 for row in reader:
+    print row[0], "---------", row[2]
+    print "-------------"
     geoIndex[row[0]]={"Name":row[1], "Parent":row[3], "Type":row[5],"Country":row[4]}
 
 #urllist=["http://investmentyogi.com","http://ndtv.com" ,"http://sulekha.com","http://amfimutualfund.com","http://apnapaisa.com","http://sify.com","http://holidayiq.com","http://indiatimes.com","http://sharetipsinfo.com","http://myzamana.com","http://ehow.com","http://mutualfundsnavindia.com","http://firstpost.com","http://appuonline.com"]

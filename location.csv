@@ -1,4 +1,4 @@
-"Criteria ID","Name","Canonical Name","Parent ID","Country Code","Target Type","Status"
+2410,"South Korea","South Korea",,"KR","Country","Active"
 2356,"India","India",,"IN","Country","Active"
 20452,"Andaman and Nicobar Islands","Andaman and Nicobar Islands,India",2356,"IN","UT","Active"
 20453,"Andhra Pradesh","Andhra Pradesh,India",2356,"IN","State","Active"
@@ -627,4 +627,3 @@
 21331,"Gyeongsangbuk-do","Gyeongsangbuk-do,South Korea",2410,"KR","Region","Active"
 21332,"Gyeongsangnam-do","Gyeongsangnam-do,South Korea",2410,"KR","Region","Active"
 21333,"Jeju-do","Jeju-do,South Korea",2410,"KR","Region","Active"
-2410,"South Korea","South Korea",,"KR","Country","Active"
