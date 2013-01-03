@@ -223,7 +223,6 @@ class MainHandler(tornado.web.RequestHandler):
 				responseAdSlot.max_cpm_micros=int(bidMicros)
 		    response.processing_time_ms=int((time.time()-start)*1000)
 		    
-		    print sys.getsizeof(bidCountIndex)
 		    bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"] += 1
 		    if int(time.time() - bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Lastupdate"])>10:
 		      i = bidCountIndex["GoogleAdX"][domain]["DesktopDisplay"][country.upper()][str(ad.width[0])+'x'+str(ad.height[0])]["Impressions"]
