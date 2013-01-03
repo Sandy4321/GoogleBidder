@@ -26,7 +26,7 @@ import os
 import sqlite3
 import thread
 import socket
-import csvtime.time()
+import csv
 import realtime_bidding_proto_pb2
 from pyDes import *
 from urlparse import urlparse
