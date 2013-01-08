@@ -212,7 +212,7 @@ class MainHandler(tornado.web.RequestHandler):
 				bidMicros = finalBid * 1000000
 				info = base64.b64encode(json.dumps({'e':'google','d':domain,'bid':randomBannerId,'cid':finalCampaign, 'b':finalBid, "s":state,"c":city,"country":country}))
 				info = info.replace("+","-").replace("/","_").replace("=","")
-				code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p=%%WINNING_PRICE%%&r=%%CACHEBUSTER%%&red=%%CLICK_URL_UNESC%%" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'
+				code='<iframe src="http://rtbidder.impulse01.com/serve?info='+info+'&p=%%WINNING_PRICE%%&r=%%CACHEBUSTER%%&red=" width="'+str(ad.width[0])+'" height="'+str(ad.height[0])+'" frameborder=0 marginwidth=0 marginheight=0 scrolling=NO></iframe>'
 				responsead = response.ad.add()
 				responsead.html_snippet = code
 				responsead.buyer_creative_id= str(randomBannerId)
