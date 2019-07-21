@@ -1,7 +1,6 @@
 #Real Time Bidding Engine for Google Ad Exchange
-#Sensitive code, lot of logics have been used at different places. Changing might cause un-noticable bugs
 #Copyright(C) - Impulse Media Private Limited
-#Authored - Aditya Singh and Phaneendra Hegde
+#Authored - Aditya Singh
 #INSTALL-Tornado, Protocol Buffers C++ Library
 #Start multiple processes of this app (~ 1 per core) and load balance them with nginx
 
